@@ -19,6 +19,8 @@ import com.xtremelabs.robolectric.RobolectricTestRunner;
 @RunWith(RobolectricTestRunner.class)
 public class RestClientTest {
 
+	static final String TEST_ENDPOINT = "http://localhost:4567/test_endpoint";
+	
 	RestResult restResult;
 	
 	@Test
@@ -31,10 +33,10 @@ public class RestClientTest {
 	
 	@Test
 	public void shouldSetResource() {
-		RestClient client = RestClient.clientWithBaseUrl("http://api.example.org");
-		client.setResource("articles");
-		assertThat("http://api.example.org/articles",
-			equalTo(client.getUrl()));
+		RestClient client = RestClient
+			.clientWithBaseUrl("http://api.example.org")
+			.setResource("articles");
+		assertThat("http://api.example.org/articles", equalTo(client.getUrl()));
 	}
 	
 	@Test
@@ -52,9 +54,9 @@ public class RestClientTest {
 	}
 	
 	@Test
-	public void shouldGetFromServer() throws InterruptedException {
+	public void shouldGet() throws InterruptedException {
 		final CountDownLatch latch = new CountDownLatch(1);		
-		RestClient.clientWithBaseUrl("http://localhost:4567/test_endpoint")
+		RestClient.clientWithBaseUrl(TEST_ENDPOINT)
 			.setResource("articles")
 			.execute(new RestClient.OnCompletionListener() {					
 				@Override
@@ -72,6 +74,7 @@ public class RestClientTest {
 		
 		if (latch.await(5, TimeUnit.SECONDS)) {
 			assertTrue(restResult.isSuccess());
+			assertThat(HttpURLConnection.HTTP_OK, equalTo(restResult.getResponseCode()));
 			assertThat("Articles", equalTo(restResult.getResponse()));
 		}
 		else {
@@ -82,7 +85,7 @@ public class RestClientTest {
 	@Test
 	public void shouldThrowOnPostToNonExistentResource() throws InterruptedException {
 		final CountDownLatch latch = new CountDownLatch(1);		
-		RestClient.clientWithBaseUrl("http://localhost:4567/test_endpoint")
+		RestClient.clientWithBaseUrl(TEST_ENDPOINT)
 			.setResource("articles/does_not_exist")
 			.post()
 			.execute(new RestClient.OnCompletionListener() {					
@@ -105,7 +108,7 @@ public class RestClientTest {
 			assertThat(HttpURLConnection.HTTP_NOT_FOUND, equalTo(restResult.getResponseCode()));
 		}
 		else {
-			fail("Timed out waiting for GET completion");
+			fail("Timed out waiting for non-existent POST completion");
 		}
 	}
 
