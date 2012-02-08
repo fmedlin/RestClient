@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,13 +17,7 @@ import com.xtremelabs.robolectric.RobolectricTestRunner;
 @RunWith(RobolectricTestRunner.class)
 public class RestClientTest {
 
-	CountDownLatch latch;
 	RestResult restResult;
-	
-	@Before
-	public void setUp() {
-		latch = new CountDownLatch(1);		
-	}
 	
 	@Test
 	public void shouldConfigureSharedSingleton() {
@@ -58,6 +51,7 @@ public class RestClientTest {
 	
 	@Test
 	public void shouldGetFromServer() throws InterruptedException {
+		final CountDownLatch latch = new CountDownLatch(1);		
 		RestClient.clientWithBaseUrl("http://localhost:4567/test_endpoint")
 			.setResource("articles")
 			.execute(new RestClient.OnCompletionListener() {					
