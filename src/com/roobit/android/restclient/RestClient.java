@@ -1,8 +1,11 @@
 package com.roobit.android.restclient;
 
+import android.net.Uri;
+
 public class RestClient {
 
 	String baseUrl;
+	String resource;
 	
 	static RestClient instance;
 	
@@ -25,4 +28,25 @@ public class RestClient {
 	public String getBaseUrl() {
 		return baseUrl;
 	}
+	
+	public String getUrl() {
+		return buildUri().toString();
+	}
+
+	private Uri buildUri() {
+		Uri.Builder builder = Uri.parse(getBaseUrl())
+				.buildUpon()
+				.appendEncodedPath(getResource());
+		return builder.build();
+	}
+	
+	private String getResource() {
+		return resource;
+	}
+	
+	public RestClient setResource(String resource) {
+		this.resource = resource;
+		return this;
+	}
+	
 }
