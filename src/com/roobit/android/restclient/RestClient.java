@@ -91,6 +91,12 @@ public class RestClient implements RestClientRequestListener {
 		return operation;
 	}
 	
+	public RestClient post() {
+		operation = Operation.POST;
+		setQueryParameters(null);
+		return this;
+	}
+	
 	@Override
 	public void requestStarted() {
 		// TODO Auto-generated method stub		
@@ -108,4 +114,5 @@ public class RestClient implements RestClientRequestListener {
 			completionListener.success(this, result);
 		}
 	}
+
 }

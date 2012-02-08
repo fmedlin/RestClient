@@ -3,6 +3,8 @@ package com.roobit.android.restclient.exampleapp;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 
+import java.io.FileNotFoundException;
+import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -76,4 +78,35 @@ public class RestClientTest {
 			fail("Timed out waiting for GET completion");
 		}
 	}
+	
+	@Test
+	public void shouldThrowOnPostToNonExistentResource() throws InterruptedException {
+		final CountDownLatch latch = new CountDownLatch(1);		
+		RestClient.clientWithBaseUrl("http://localhost:4567/test_endpoint")
+			.setResource("articles/does_not_exist")
+			.post()
+			.execute(new RestClient.OnCompletionListener() {					
+				@Override
+				public void success(RestClient client, RestResult result) {
+					restResult = result;
+					latch.countDown();
+				}
+	
+				@Override
+				public void failedWithError(RestClient restClient, int responseCode, RestResult result) {
+					restResult = result;
+					latch.countDown();
+				}					
+		});
+		
+		if (latch.await(5, TimeUnit.SECONDS)) {
+			assertFalse(restResult.isSuccess());
+			assertTrue(restResult.getException() instanceof FileNotFoundException);
+			assertThat(HttpURLConnection.HTTP_NOT_FOUND, equalTo(restResult.getResponseCode()));
+		}
+		else {
+			fail("Timed out waiting for GET completion");
+		}
+	}
+
 }

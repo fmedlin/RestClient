@@ -16,7 +16,7 @@ public class RestResult {
 	public boolean isSuccess() {
 		return responseCode == HttpURLConnection.HTTP_OK;
 	}
-	
+		
 	public String getResponse() {
 		return response;
 	}
@@ -27,5 +27,21 @@ public class RestResult {
 	
 	public void setResponseCode(int responseCode) {
 		this.responseCode = responseCode;
+	}
+
+	public int getResponseCode() {
+		return responseCode;
+	}
+
+	public void setException(Exception exception) {
+		this.exception = exception;
+	}
+	
+	public Exception getException() {
+		return exception;
+	}
+	
+	public boolean hasException() {
+		return getException() != null;
 	}
 }

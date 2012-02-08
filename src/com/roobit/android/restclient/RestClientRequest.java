@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import android.net.Uri;
@@ -25,14 +24,11 @@ public class RestClientRequest {
 		HttpURLConnection urlConnection = null;
 		try {
 			urlConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
+			setRequestMethod(urlConnection, op);
 			result.setResponseCode(urlConnection.getResponseCode());
-			InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-			result.setResponse(convertStreamToString(in));
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getInputStream())));
+		} catch (Exception e) {
+			result.setException(e);
 			e.printStackTrace();
 		} finally {
 			if (urlConnection != null) {
@@ -43,6 +39,14 @@ public class RestClientRequest {
 		return result;
 	}
 
+	private static void setRequestMethod(HttpURLConnection urlConnection, Operation op) {
+		if (op == Operation.POST) {
+			urlConnection.setDoOutput(true);
+			urlConnection.setChunkedStreamingMode(0);
+		}
+		// TODO: Handle OPTIONS, HEAD, PUT, DELETE and TRACE
+	}
+	
 	private static String convertStreamToString(InputStream is) throws IOException {
 		final char[] buffer = new char[0x10000];
 		StringBuilder sb = new StringBuilder();
