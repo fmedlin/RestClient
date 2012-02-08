@@ -1,3 +1,5 @@
+example-app/tmp/**
+
 # built application files
 *.apk
 *.ap_

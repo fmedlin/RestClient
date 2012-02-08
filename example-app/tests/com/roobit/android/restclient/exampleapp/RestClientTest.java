@@ -4,14 +4,17 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.roobit.android.restclient.RestClient;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 
 @RunWith(RobolectricTestRunner.class)
 public class RestClientTest {
 
 	@Test
-	public void shouldHaveHappySmiles() throws Exception {
-        String hello = new TestActivity().getResources().getString(R.string.hello);
-        assertEquals(hello, "Hello, world");
-    }
+	public void shouldConfigureSharedSingleton() {
+		RestClient first = RestClient.clientWithBaseUrl("http://api.example.org");
+		RestClient.clientWithBaseUrl("http://api.google.com");
+		assertEquals(first.getBaseUrl(), RestClient.sharedClient().getBaseUrl());
+	}
 }

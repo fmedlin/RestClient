@@ -22,4 +22,7 @@ public class RestClient {
 		this.baseUrl = baseUrl;
 	}
 
+	public String getBaseUrl() {
+		return baseUrl;
+	}
 }
