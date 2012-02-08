@@ -1,11 +1,17 @@
 package com.roobit.android.restclient;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import android.net.Uri;
 
 public class RestClient {
 
 	String baseUrl;
 	String resource;
+	LinkedHashMap<String, String> queryParameters;
 	
 	static RestClient instance;
 	
@@ -37,6 +43,14 @@ public class RestClient {
 		Uri.Builder builder = Uri.parse(getBaseUrl())
 				.buildUpon()
 				.appendEncodedPath(getResource());
+		
+		if (queryParameters != null && !queryParameters.isEmpty()) {
+			Iterator<Entry<String, String>> iter = queryParameters.entrySet().iterator();
+			while (iter.hasNext()) {
+				Entry<String, String> entry = iter.next();
+				builder.appendQueryParameter(entry.getKey(), entry.getValue());				
+			}
+		}
 		return builder.build();
 	}
 	
@@ -49,4 +63,8 @@ public class RestClient {
 		return this;
 	}
 	
+	public RestClient setQueryParameters(LinkedHashMap<String,String> queryParameters) {
+		this.queryParameters = queryParameters;
+		return this;
+	}
 }
