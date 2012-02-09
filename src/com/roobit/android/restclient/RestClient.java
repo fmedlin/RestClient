@@ -3,6 +3,7 @@ package com.roobit.android.restclient;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import com.roobit.android.restclient.RestClientRequestTask.RestClientRequestListener;
 
@@ -20,6 +21,7 @@ public class RestClient implements RestClientRequestListener {
 	String baseUrl;
 	String resource;
 	LinkedHashMap<String, String> queryParameters;
+	Properties httpHeaders;
 	Operation operation;
 	OnCompletionListener completionListener;
 	
@@ -55,8 +57,8 @@ public class RestClient implements RestClientRequestListener {
 
 	private Uri buildUri() {
 		Uri.Builder builder = Uri.parse(getBaseUrl())
-				.buildUpon()
-				.appendEncodedPath(getResource());
+			.buildUpon()
+			.appendEncodedPath(getResource());
 		
 		if (queryParameters != null && !queryParameters.isEmpty()) {
 			Iterator<Entry<String, String>> iter = queryParameters.entrySet().iterator();
@@ -84,7 +86,7 @@ public class RestClient implements RestClientRequestListener {
 	
 	public RestClient execute(OnCompletionListener completionListener) {
 		this.completionListener = completionListener;
-		new RestClientRequestTask(this).execute(getOperation(), buildUri());
+		new RestClientRequestTask(this).execute(getOperation(), buildUri(), httpHeaders);
 		return this;
 	}
 
@@ -98,7 +100,19 @@ public class RestClient implements RestClientRequestListener {
 	public RestClient post() {
 		operation = Operation.POST;
 		setQueryParameters(null);
+		setHttpHeaders(null);
 		return this;
+	}
+
+	public RestClient post(Properties httpHeaders) {
+		operation = Operation.POST;
+		setQueryParameters(null);
+		setHttpHeaders(httpHeaders);
+		return this;
+	}
+
+	private void setHttpHeaders(Properties httpHeaders) {
+		this.httpHeaders = httpHeaders;
 	}
 	
 	@Override
@@ -113,7 +127,7 @@ public class RestClient implements RestClientRequestListener {
 
 	@Override
 	public void requestFinished(RestResult result) {
-		// TODO: Determine result success of failure
+		// TODO: Determine result success or failure and call correct listener method
 		if (completionListener != null) {
 			completionListener.success(this, result);
 		}

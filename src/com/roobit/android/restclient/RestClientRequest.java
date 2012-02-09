@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.Properties;
 
 import android.net.Uri;
 import android.util.Log;
@@ -18,6 +20,10 @@ public class RestClientRequest {
 	static final String TAG = "RestClientRequest";
 
 	public static RestResult synchronousExecute(Operation op, Uri uri) {
+		return synchronousExecute(op, uri, null);
+	}
+	
+	public static RestResult synchronousExecute(Operation op, Uri uri, Properties httpHeaders) {
 		Log.d(TAG, "Executing " + op.toString() + " to " + uri.toString());
 		
 		RestResult result = new RestResult();
@@ -25,6 +31,7 @@ public class RestClientRequest {
 		try {
 			urlConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
 			setRequestMethod(urlConnection, op);
+			setRequestHeaders(urlConnection, httpHeaders);
 			result.setResponseCode(urlConnection.getResponseCode());
 			result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getInputStream())));
 		} catch (Exception e) {
@@ -45,6 +52,18 @@ public class RestClientRequest {
 			urlConnection.setChunkedStreamingMode(0);
 		}
 		// TODO: Handle OPTIONS, HEAD, PUT, DELETE and TRACE
+	}
+	
+	private static void setRequestHeaders(HttpURLConnection urlConnection, Properties httpHeaders) {
+		if (httpHeaders == null) {
+			return;
+		}
+		
+		Iterator<Object> iter = httpHeaders.keySet().iterator();
+		while(iter.hasNext()) {
+			String name = (String) iter.next();
+			urlConnection.setRequestProperty(name, httpHeaders.getProperty(name));
+		}
 	}
 	
 	private static String convertStreamToString(InputStream is) throws IOException {

@@ -12,3 +12,7 @@ end
 post '/test_endpoint/echo_request_method' do
   request.request_method
 end
+
+post '/test_endpoint/awesome_header' do
+  env['HTTP_X_SOME_SPECIAL_HEADER']
+end
