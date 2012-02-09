@@ -8,3 +8,7 @@ end
 get '/test_endpoint/articles' do
   'Articles'
 end
+
+post '/test_endpoint/echo_request_method' do
+  request.request_method
+end

@@ -29,6 +29,10 @@ public class RestClient implements RestClientRequestListener {
 		return instance;
 	}
 	
+	public static void clearSharedClient() {
+		instance = null;
+		
+	}
 	public static RestClient clientWithBaseUrl(String baseUrl) {
 		RestClient client =  new RestClient(baseUrl);
 		if (instance == null) {

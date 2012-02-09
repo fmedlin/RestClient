@@ -1,6 +1,6 @@
 package com.roobit.android.restclient.exampleapp;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.FileNotFoundException;
@@ -25,6 +25,7 @@ public class RestClientTest {
 	
 	@Test
 	public void shouldConfigureSharedSingleton() {
+		RestClient.clearSharedClient();
 		RestClient first = RestClient.clientWithBaseUrl("http://api.example.org");
 		RestClient.clientWithBaseUrl("http://api.google.com");
 		assertThat(first.getBaseUrl(),
@@ -54,7 +55,7 @@ public class RestClientTest {
 	}
 	
 	@Test
-	public void shouldGet() throws InterruptedException {
+	public void shouldGet() throws Exception {
 		final CountDownLatch latch = new CountDownLatch(1);		
 		RestClient.clientWithBaseUrl(TEST_ENDPOINT)
 			.setResource("articles")
@@ -83,11 +84,10 @@ public class RestClientTest {
 	}
 	
 	@Test
-	public void shouldThrowOnPostToNonExistentResource() throws InterruptedException {
+	public void shouldThrowOnNonExistentResource() throws Exception {
 		final CountDownLatch latch = new CountDownLatch(1);		
 		RestClient.clientWithBaseUrl(TEST_ENDPOINT)
 			.setResource("articles/does_not_exist")
-			.post()
 			.execute(new RestClient.OnCompletionListener() {					
 				@Override
 				public void success(RestClient client, RestResult result) {
@@ -104,12 +104,11 @@ public class RestClientTest {
 		
 		if (latch.await(5, TimeUnit.SECONDS)) {
 			assertFalse(restResult.isSuccess());
-			assertTrue(restResult.getException() instanceof FileNotFoundException);
+			assertThat(restResult.getException(), is(FileNotFoundException.class));
 			assertThat(HttpURLConnection.HTTP_NOT_FOUND, equalTo(restResult.getResponseCode()));
 		}
 		else {
 			fail("Timed out waiting for non-existent POST completion");
 		}
 	}
-
 }
