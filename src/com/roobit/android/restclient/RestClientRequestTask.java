@@ -24,7 +24,8 @@ public class RestClientRequestTask extends AsyncTask<Object, Void, RestResult> {
 		RestClient.Operation op = (RestClient.Operation) args[0];
 		Uri uri = (Uri) args[1];
 		Properties httpHeaders = (Properties) args[2];
-		return RestClientRequest.synchronousExecute(op, uri, httpHeaders);
+		Properties parameters = (Properties) args[3];
+		return RestClientRequest.synchronousExecute(op, uri, httpHeaders, parameters);
 	}
 
 	

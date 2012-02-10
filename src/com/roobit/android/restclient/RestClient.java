@@ -22,6 +22,7 @@ public class RestClient implements RestClientRequestListener {
 	String resource;
 	LinkedHashMap<String, String> queryParameters;
 	Properties httpHeaders;
+	Properties parameters;
 	Operation operation;
 	OnCompletionListener completionListener;
 	
@@ -86,7 +87,7 @@ public class RestClient implements RestClientRequestListener {
 	
 	public RestClient execute(OnCompletionListener completionListener) {
 		this.completionListener = completionListener;
-		new RestClientRequestTask(this).execute(getOperation(), buildUri(), httpHeaders);
+		new RestClientRequestTask(this).execute(getOperation(), buildUri(), httpHeaders, parameters);
 		return this;
 	}
 
@@ -105,14 +106,30 @@ public class RestClient implements RestClientRequestListener {
 	}
 
 	public RestClient post(Properties httpHeaders) {
-		operation = Operation.POST;
-		setQueryParameters(null);
+		post();
 		setHttpHeaders(httpHeaders);
+		return this;
+	}
+
+	public RestClient postForm(Properties parameters) {
+		post();
+		setParameters(parameters);
+		return this;
+	}
+	
+	public RestClient patch() {
+		operation = Operation.PATCH;
+		setQueryParameters(null);
+		setHttpHeaders(new Properties());
 		return this;
 	}
 
 	private void setHttpHeaders(Properties httpHeaders) {
 		this.httpHeaders = httpHeaders;
+	}
+	
+	private void setParameters(Properties parameters) {
+		this.parameters = parameters;
 	}
 	
 	@Override

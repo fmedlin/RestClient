@@ -16,3 +16,13 @@ end
 post '/test_endpoint/awesome_header' do
   env['HTTP_X_SOME_SPECIAL_HEADER']
 end
+
+patch '/test_endpoint/should_patch' do
+  halt 400 unless request.patch?
+end
+
+post '/test_endpoint/should_post_form' do
+  halt 400 unless
+    params[:username] == 'assad' &&
+    params[:password] == '12345'
+end
