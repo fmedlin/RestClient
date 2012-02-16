@@ -1,5 +1,6 @@
 package com.roobit.android.restclient;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -23,6 +24,7 @@ public class RestClient implements RestClientRequestListener {
 	LinkedHashMap<String, String> queryParameters;
 	Properties httpHeaders;
 	Properties parameters;
+	ByteArrayOutputStream postData;
 	Operation operation;
 	OnCompletionListener completionListener;
 	
@@ -87,7 +89,7 @@ public class RestClient implements RestClientRequestListener {
 	
 	public RestClient execute(OnCompletionListener completionListener) {
 		this.completionListener = completionListener;
-		new RestClientRequestTask(this).execute(getOperation(), buildUri(), httpHeaders, parameters);
+		new RestClientRequestTask(this).execute(getOperation(), buildUri(), httpHeaders, parameters, postData);
 		return this;
 	}
 
@@ -108,6 +110,13 @@ public class RestClient implements RestClientRequestListener {
 	public RestClient post(Properties httpHeaders) {
 		post();
 		setHttpHeaders(httpHeaders);
+		return this;
+	}
+	
+	public RestClient post(ByteArrayOutputStream postData, String contentType, Properties httpHeaders) {
+		post(httpHeaders == null ? new Properties() : httpHeaders);
+		setPostData(postData);
+		setContentType(contentType);
 		return this;
 	}
 
@@ -131,7 +140,17 @@ public class RestClient implements RestClientRequestListener {
 	private void setParameters(Properties parameters) {
 		this.parameters = parameters;
 	}
-	
+
+	private void setContentType(String contentType) {
+		if(contentType != null && !httpHeaders.contains("content-type")) {
+			httpHeaders.put("content-type", contentType);
+		}
+	}
+
+	private void setPostData(ByteArrayOutputStream postData) {
+		this.postData = postData;
+	}
+
 	@Override
 	public void requestStarted() {
 		// TODO Auto-generated method stub		

@@ -1,5 +1,6 @@
 package com.roobit.android.restclient;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 
 import android.net.Uri;
@@ -25,7 +26,8 @@ public class RestClientRequestTask extends AsyncTask<Object, Void, RestResult> {
 		Uri uri = (Uri) args[1];
 		Properties httpHeaders = (Properties) args[2];
 		Properties parameters = (Properties) args[3];
-		return RestClientRequest.synchronousExecute(op, uri, httpHeaders, parameters);
+		ByteArrayOutputStream postData = (ByteArrayOutputStream) args[4];
+		return RestClientRequest.synchronousExecute(op, uri, httpHeaders, parameters, postData);
 	}
 
 	

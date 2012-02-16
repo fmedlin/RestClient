@@ -2,6 +2,8 @@ package com.roobit.android.restclient;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -31,17 +33,18 @@ public class RestClientRequest {
 	}
 
 	public static RestResult synchronousExecute(Operation op, Uri uri, Properties httpHeaders) {
-		return synchronousExecute(op, uri, httpHeaders, null);
+		return synchronousExecute(op, uri, httpHeaders, null, null);
 	}
 
 	public static RestResult synchronousExecute(Operation op,
 			Uri uri, 
 			Properties httpHeaders,
-			Properties parameters) {
+			Properties parameters,
+			ByteArrayOutputStream postData) {
 		
 		Log.d(TAG, "Executing " + op.toString() + " to " + uri.toString());
 		
-		streamingMode = (parameters == null) ? StreamingMode.CHUNKED : StreamingMode.FIXED;
+		streamingMode = (parameters == null && postData == null)  ? StreamingMode.CHUNKED : StreamingMode.FIXED;
 		
 		RestResult result = new RestResult();
 		HttpURLConnection urlConnection = null;
@@ -49,7 +52,11 @@ public class RestClientRequest {
 			urlConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
 			setRequestMethod(urlConnection, op, httpHeaders);
 			setRequestHeaders(urlConnection, httpHeaders);
-			setRequestParameters(urlConnection, parameters);
+			if(postData != null) {
+				setPostData(urlConnection, postData);
+			} else if(parameters != null){
+				setRequestParameters(urlConnection, parameters);
+			}
 			result.setResponseCode(urlConnection.getResponseCode());
 			result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getInputStream())));
 		} catch (Exception e) {
@@ -62,6 +69,30 @@ public class RestClientRequest {
 		}
 		
 		return result;
+	}
+
+	private static final int BUFFER_SIZE = 512;
+	private static void setPostData(HttpURLConnection urlConnection, ByteArrayOutputStream postData) {
+		byte[] buffer = new byte[BUFFER_SIZE];
+		urlConnection.setFixedLengthStreamingMode(postData.size());
+
+		OutputStream os = null;
+		try {
+			os = new BufferedOutputStream(urlConnection.getOutputStream());
+			ByteArrayInputStream bais = new ByteArrayInputStream(postData.toByteArray());
+			while(bais.read(buffer, 0, BUFFER_SIZE) > 0) {
+				os.write(buffer);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (os != null) {
+				try {
+					os.flush();
+					os.close();
+				} catch (Exception e) {}
+			}
+		}
 	}
 
 	private static void setRequestMethod(HttpURLConnection urlConnection, Operation op, Properties httpProperties) {
