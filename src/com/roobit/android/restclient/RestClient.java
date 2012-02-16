@@ -163,9 +163,12 @@ public class RestClient implements RestClientRequestListener {
 
 	@Override
 	public void requestFinished(RestResult result) {
-		// TODO: Determine result success or failure and call correct listener method
 		if (completionListener != null) {
-			completionListener.success(this, result);
+			if(result.isSuccess()) {
+				completionListener.success(this, result);
+			} else {
+				completionListener.failedWithError(this, result.getResponseCode(), result);
+			}
 		}
 	}
 
