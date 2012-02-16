@@ -80,8 +80,9 @@ public class RestClientRequest {
 		try {
 			os = new BufferedOutputStream(urlConnection.getOutputStream());
 			ByteArrayInputStream bais = new ByteArrayInputStream(postData.toByteArray());
-			while(bais.read(buffer, 0, BUFFER_SIZE) > 0) {
-				os.write(buffer);
+			int count;
+			while((count = bais.read(buffer, 0, BUFFER_SIZE)) > 0) {
+				os.write(buffer, 0, count);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
