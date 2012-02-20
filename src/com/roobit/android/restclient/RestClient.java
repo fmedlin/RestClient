@@ -110,6 +110,25 @@ public class RestClient implements RestClientRequestListener {
 		return operation;
 	}
 	
+	public RestClient get() {
+		operation = Operation.GET;
+		setHttpHeaders(null);
+		setParameters(null);
+		return this;
+	}
+	
+	public RestClient get(Properties headers) {
+		get();
+		setHttpHeaders(headers);
+		return this;
+	}
+	
+	public RestClient get(Properties headers, Properties queryParams) {
+		get(headers);
+		setParameters(queryParams);
+		return this;
+	}
+	
 	public RestClient post() {
 		operation = Operation.POST;
 		setQueryParameters(null);
