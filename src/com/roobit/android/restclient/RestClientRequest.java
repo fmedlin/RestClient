@@ -58,6 +58,7 @@ public class RestClientRequest {
 				setRequestParameters(urlConnection, parameters);
 			}
 			result.setResponseCode(urlConnection.getResponseCode());
+			Log.d(TAG, " - received response code [" + urlConnection.getResponseCode() + "]");
 			if(urlConnection.getResponseCode() < 400) {
 				result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getInputStream())));
 			} else {
