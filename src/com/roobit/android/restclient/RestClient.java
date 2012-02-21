@@ -92,12 +92,41 @@ public class RestClient implements RestClientRequestListener {
 		new RestClientRequestTask(this).execute(getOperation(), buildUri(), httpHeaders, parameters, postData);
 		return this;
 	}
+	
+	/**
+	 * For clients managing their own threads, provide a synchronous method.
+	 * 
+	 * @return the result of the request.
+	 */
+	public RestResult synchronousExecute() {
+		return RestClientRequest.synchronousExecute(getOperation(), buildUri(), httpHeaders, parameters, postData);
+	}
+
 
 	private Operation getOperation() {
 		if (operation == null) {
 			operation = Operation.GET;
 		}
 		return operation;
+	}
+	
+	public RestClient get() {
+		operation = Operation.GET;
+		setHttpHeaders(null);
+		setParameters(null);
+		return this;
+	}
+	
+	public RestClient get(Properties headers) {
+		get();
+		setHttpHeaders(headers);
+		return this;
+	}
+	
+	public RestClient get(Properties headers, Properties queryParams) {
+		get(headers);
+		setParameters(queryParams);
+		return this;
 	}
 	
 	public RestClient post() {
