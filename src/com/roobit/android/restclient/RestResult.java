@@ -14,7 +14,8 @@ public class RestResult {
 	}
 	
 	public boolean isSuccess() {
-		return responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_ACCEPTED || responseCode == HttpURLConnection.HTTP_CREATED;
+		return responseCode < HttpURLConnection.HTTP_BAD_REQUEST &&
+				responseCode >= HttpURLConnection.HTTP_OK;
 	}
 		
 	public String getResponse() {
