@@ -52,11 +52,9 @@ public class RestClientRequest {
 			urlConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
 			setRequestMethod(urlConnection, op, httpHeaders);
 			setRequestHeaders(urlConnection, httpHeaders);
-			if(postData != null) {
-				setPostData(urlConnection, postData);
-			} else if(parameters != null){
-				setRequestParameters(urlConnection, parameters);
-			}
+			setPostData(urlConnection, postData);
+			setRequestParameters(urlConnection, parameters);
+			
 			result.setResponseCode(urlConnection.getResponseCode());
 			Log.d(TAG, " - received response code [" + urlConnection.getResponseCode() + "]");
 			if(urlConnection.getResponseCode() < 400) {
@@ -78,6 +76,10 @@ public class RestClientRequest {
 
 	private static final int BUFFER_SIZE = 512;
 	private static void setPostData(HttpURLConnection urlConnection, ByteArrayOutputStream postData) {
+		if (postData == null) {
+			return;
+		}
+		
 		byte[] buffer = new byte[BUFFER_SIZE];
 		urlConnection.setFixedLengthStreamingMode(postData.size());
 
