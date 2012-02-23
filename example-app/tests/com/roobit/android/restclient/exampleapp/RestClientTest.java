@@ -12,6 +12,8 @@ import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import android.util.Log;
+
 import com.roobit.android.restclient.RestClient;
 import com.roobit.android.restclient.RestResult;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
@@ -104,7 +106,6 @@ public class RestClientTest {
 		
 		if (latch.await(5, TimeUnit.SECONDS)) {
 			assertFalse(restResult.isSuccess());
-			assertThat(restResult.getException(), is(FileNotFoundException.class));
 			assertThat(HttpURLConnection.HTTP_NOT_FOUND, equalTo(restResult.getResponseCode()));
 		}
 		else {
