@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'cgi'
+require 'json'
 
 get '/' do
   'Hello, world'
@@ -25,4 +26,9 @@ post '/test_endpoint/should_post_form' do
   halt 400 unless
     params[:username] == 'assad' &&
     params[:password] == '12345'
+end
+
+post '/test_endpoint/should_post_data' do
+  data = JSON.parse request.body.read
+  halt 400 unless data["id"] == 42
 end

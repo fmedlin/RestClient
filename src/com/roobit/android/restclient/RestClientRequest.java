@@ -57,9 +57,10 @@ public class RestClientRequest {
 			
 			result.setResponseCode(urlConnection.getResponseCode());
 			Log.d(TAG, " - received response code [" + urlConnection.getResponseCode() + "]");
-			if(urlConnection.getResponseCode() < 400) {
+			if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
 				result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getInputStream())));
-			} else {
+			}
+			else {
 				result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getErrorStream())));
 			}
 		} catch (Exception e) {
@@ -184,10 +185,10 @@ public class RestClientRequest {
 		int read;
 		do {
 			read = in.read(buffer, 0, buffer.length);
-			if (read>0) {
+			if (read > 0) {
 				sb.append(buffer, 0, read);
 			}
-		} while (read>=0);
+		} while (read >= 0);
 		
 		return sb.toString();
 	}

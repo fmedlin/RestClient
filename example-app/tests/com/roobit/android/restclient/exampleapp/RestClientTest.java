@@ -3,7 +3,6 @@ package com.roobit.android.restclient.exampleapp;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import java.io.FileNotFoundException;
 import java.net.HttpURLConnection;
 import java.util.LinkedHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -11,8 +10,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import android.util.Log;
 
 import com.roobit.android.restclient.RestClient;
 import com.roobit.android.restclient.RestResult;

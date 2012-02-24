@@ -141,7 +141,17 @@ public class RestClient implements RestClientRequestListener {
 		setHttpHeaders(httpHeaders);
 		return this;
 	}
-	
+
+	public RestClient post(ByteArrayOutputStream postData) {
+		post(postData, "application/json", null);
+		return this;
+	}
+
+	public RestClient post(ByteArrayOutputStream postData, String contentType) {
+		post(postData, contentType, null);
+		return this;
+	}
+
 	public RestClient post(ByteArrayOutputStream postData, String contentType, Properties httpHeaders) {
 		post(httpHeaders == null ? new Properties() : httpHeaders);
 		setPostData(postData);
