@@ -190,17 +190,14 @@ public class RestClient implements RestClientRequestListener {
 		this.postData = postData;
 	}
 
-	@Override
 	public void requestStarted() {
 		// TODO Auto-generated method stub		
 	}
 
-	@Override
 	public void requestCancelled() {
 		// TODO Auto-generated method stub
 	}
 
-	@Override
 	public void requestFinished(RestResult result) {
 		if (completionListener != null) {
 			if(result.isSuccess()) {
