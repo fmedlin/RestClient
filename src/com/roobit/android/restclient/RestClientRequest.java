@@ -2,7 +2,6 @@ package com.roobit.android.restclient;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +22,9 @@ import com.roobit.android.restclient.RestClient.Operation;
 
 public class RestClientRequest {
 
-	public enum StreamingMode { CHUNKED, FIXED };
-
 	static final String TAG = "RestClientRequest";
+
+	public enum StreamingMode { CHUNKED, FIXED };
 	static StreamingMode streamingMode = StreamingMode.CHUNKED;
 	
 	public static RestResult synchronousExecute(Operation op, Uri uri) {
@@ -50,18 +49,28 @@ public class RestClientRequest {
 		HttpURLConnection urlConnection = null;
 		try {
 			urlConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
-			setRequestMethod(urlConnection, op, httpHeaders);
+			//setAuthentication(urlConnection, uri.getEncodedUserInfo());
 			setRequestHeaders(urlConnection, httpHeaders);
-			setPostData(urlConnection, postData);
 			setRequestParameters(urlConnection, parameters);
+			setRequestMethod(urlConnection, op, httpHeaders);
+			setPostData(urlConnection, postData);
 			
-			result.setResponseCode(urlConnection.getResponseCode());
+			int statusCode = 0;
+			try {
+				statusCode = urlConnection.getResponseCode();
+			} catch (IOException e) {
+				statusCode = HttpURLConnection.HTTP_UNAUTHORIZED;
+			}
+			
+			result.setResponseCode(statusCode);
 			Log.d(TAG, " - received response code [" + urlConnection.getResponseCode() + "]");
-			if (urlConnection.getResponseCode() < HttpURLConnection.HTTP_BAD_REQUEST) {
+			if (statusCode < HttpURLConnection.HTTP_BAD_REQUEST) {
 				result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getInputStream())));
 			}
 			else {
-				result.setResponse(convertStreamToString(new BufferedInputStream(urlConnection.getErrorStream())));
+				String errorMessage = convertStreamToString(new BufferedInputStream(urlConnection.getErrorStream())); 
+				Log.d(TAG, "error message: " + errorMessage);
+				result.setResponse(errorMessage);
 			}
 		} catch (Exception e) {
 			result.setException(e);
@@ -75,46 +84,50 @@ public class RestClientRequest {
 		return result;
 	}
 
-	private static final int BUFFER_SIZE = 512;
+	@SuppressWarnings("unused")
+	private static void setAuthentication(HttpURLConnection urlConnection, String encodedUserInfo) {
+		if (encodedUserInfo != null) {
+			urlConnection.setRequestProperty("Authorization", "Basic " + encodedUserInfo);
+		}
+	}
+
 	private static void setPostData(HttpURLConnection urlConnection, ByteArrayOutputStream postData) {
 		if (postData == null) {
 			return;
 		}
 		
-		byte[] buffer = new byte[BUFFER_SIZE];
 		urlConnection.setFixedLengthStreamingMode(postData.size());
-
 		OutputStream os = null;
 		try {
-			os = new BufferedOutputStream(urlConnection.getOutputStream());
-			ByteArrayInputStream bais = new ByteArrayInputStream(postData.toByteArray());
-			int count;
-			while((count = bais.read(buffer, 0, BUFFER_SIZE)) > 0) {
-				os.write(buffer, 0, count);
-			}
+			os = urlConnection.getOutputStream();
+			os.write(postData.toByteArray());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
 			if (os != null) {
 				try {
-					os.flush();
 					os.close();
 				} catch (Exception e) {}
 			}
 		}
 	}
 
-	private static void setRequestMethod(HttpURLConnection urlConnection, Operation op, Properties httpProperties) {
+	private static void setRequestMethod(HttpURLConnection urlConnection, Operation op, Properties httpProperties) throws Exception {
 		if (op == Operation.POST || op == Operation.PATCH) {
-			urlConnection.setDoOutput(true);
+			urlConnection.setDoOutput(true);			
+			urlConnection.setRequestMethod("POST");
 			
 			if (streamingMode == StreamingMode.CHUNKED) {
 				urlConnection.setChunkedStreamingMode(0);
 			}
-			
+
+
 			if (op == Operation.PATCH) {
 				httpProperties.put("X-HTTP-Method-Override", "PATCH");
 			}
+		}
+		else {
+			urlConnection.setRequestMethod("GET");			
 		}
 		
 		// TODO: Handle OPTIONS, HEAD, PUT, DELETE and TRACE

@@ -144,6 +144,7 @@ public class RestClient implements RestClientRequestListener {
 
 	public RestClient post(ByteArrayOutputStream postData) {
 		post(postData, "application/json", null);
+		httpHeaders.setProperty("Accept", "application/json");
 		return this;
 	}
 
@@ -164,7 +165,7 @@ public class RestClient implements RestClientRequestListener {
 		setParameters(parameters);
 		return this;
 	}
-	
+
 	public RestClient patch() {
 		operation = Operation.PATCH;
 		setQueryParameters(null);
@@ -181,8 +182,8 @@ public class RestClient implements RestClientRequestListener {
 	}
 
 	private void setContentType(String contentType) {
-		if(contentType != null && !httpHeaders.contains("content-type")) {
-			httpHeaders.put("content-type", contentType);
+		if(contentType != null && !httpHeaders.contains("Content-Type")) {
+			httpHeaders.put("Content-Type", contentType);
 		}
 	}
 
