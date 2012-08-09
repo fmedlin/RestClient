@@ -59,9 +59,11 @@ public class RestClient implements RestClientRequestListener {
 	}
 
 	private Uri buildUri() {
-		Uri.Builder builder = Uri.parse(getBaseUrl())
-			.buildUpon()
-			.appendEncodedPath(getResource());
+		Uri.Builder builder = Uri.parse(getBaseUrl()).buildUpon();
+		
+		if (getResource() != null) {
+			builder.appendEncodedPath(getResource());
+		}
 		
 		if (queryParameters != null && !queryParameters.isEmpty()) {
 			Iterator<Entry<String, String>> iter = queryParameters.entrySet().iterator();
