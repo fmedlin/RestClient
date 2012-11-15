@@ -116,17 +116,22 @@ public class RestClientRequest {
 		if (op == Operation.POST || op == Operation.PATCH) {
 			urlConnection.setDoOutput(true);			
 			urlConnection.setRequestMethod("POST");
-			
+
 			if (streamingMode == StreamingMode.CHUNKED) {
 				urlConnection.setChunkedStreamingMode(0);
 			}
 
-
 			if (op == Operation.PATCH) {
 				httpProperties.put("X-HTTP-Method-Override", "PATCH");
 			}
-		}
-		else {
+		} else if (op == Operation.PUT) {
+			urlConnection.setDoOutput(true);
+			urlConnection.setRequestMethod("PUT");
+
+			if (streamingMode == StreamingMode.CHUNKED) {
+				urlConnection.setChunkedStreamingMode(0);
+			}
+		} else {
 			urlConnection.setRequestMethod("GET");			
 		}
 		
