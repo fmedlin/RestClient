@@ -1,3 +1,7 @@
+# Active development has stopped
+
+RestClient has been mostly absorbed and reborn in the [twotoasters/hoot]("https://github.com/twotoasters/hoot") library. Since many of my own projects still use RestClient, I'll fix bugs as necessary, but I'll use hoot for new development.
+
 # Running Tests
 
 These instructions are for running the tests in Eclipse. There's no need to run a device or emulator.
