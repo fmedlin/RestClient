@@ -105,7 +105,7 @@ public class RestClient implements RestClientRequestListener {
 	}
 
 
-	private Operation getOperation() {
+	public Operation getOperation() {
 		if (operation == null) {
 			operation = Operation.GET;
 		}
@@ -155,6 +155,18 @@ public class RestClient implements RestClientRequestListener {
 		return this;
 	}
 
+	public RestClient post(String postData) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			baos.write(postData.getBytes());
+		} catch (Exception ex) {
+			return null;
+		}
+		post(baos, "application/json", null);
+		httpHeaders.setProperty("Accept", "application/json");
+		return this;
+	}
+
 	public RestClient post(ByteArrayOutputStream postData, String contentType, Properties httpHeaders) {
 		post(httpHeaders == null ? new Properties() : httpHeaders);
 		setPostData(postData);
@@ -172,6 +184,49 @@ public class RestClient implements RestClientRequestListener {
 		operation = Operation.PATCH;
 		setQueryParameters(null);
 		setHttpHeaders(new Properties());
+		return this;
+	}
+
+	public RestClient put() {
+		operation = Operation.PUT;
+		setQueryParameters(null);
+		setHttpHeaders(null);
+		return this;
+	}
+
+	public RestClient put(Properties httpHeaders) {
+		put();
+		setHttpHeaders(httpHeaders);
+		return this;
+	}
+
+	public RestClient put(ByteArrayOutputStream postData) {
+		put(postData, "application/json", null);
+		httpHeaders.setProperty("Accept", "application/json");
+		return this;
+	}
+
+	public RestClient put(ByteArrayOutputStream postData, String contentType) {
+		put(postData, contentType, null);
+		return this;
+	}
+
+	public RestClient put(String postData) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			baos.write(postData.getBytes());
+		} catch (Exception ex) {
+			return null;
+		}
+		put(baos, "application/json", null);
+		httpHeaders.setProperty("Accept", "application/json");
+		return this;
+	}
+
+	public RestClient put(ByteArrayOutputStream postData, String contentType, Properties httpHeaders) {
+		put(httpHeaders == null ? new Properties() : httpHeaders);
+		setPostData(postData);
+		setContentType(contentType);
 		return this;
 	}
 
