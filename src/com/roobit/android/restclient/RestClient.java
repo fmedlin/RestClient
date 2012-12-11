@@ -230,6 +230,12 @@ public class RestClient implements RestClientRequestListener {
 		return this;
 	}
 
+	public RestClient putForm(Properties parameters) {
+		put();
+		setParameters(parameters);
+		return this;
+	}
+
 	private void setHttpHeaders(Properties httpHeaders) {
 		this.httpHeaders = httpHeaders;
 	}
